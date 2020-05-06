@@ -32,7 +32,7 @@ function component() {
 document.body.appendChild(component());
 ```
 
-上記の`src/index.js`にて`lodash`というライブラリを使っているので、これをインストールしておく。
+上記の`src/index.js`にて[lodash](https://lodash.com/)というライブラリを使っているので、これをインストールしておく。
 
 ```
 yarn add lodash
@@ -311,3 +311,5 @@ webpackの設定を行います。`module`の部分を下記のものに置き�
 
 - webpackの[Getting Started](https://webpack.js.org/guides/getting-started/)
 - [npmコマンドとyarnコマンドの比較（Migrating from npm）](https://classic.yarnpkg.com/en/docs/migrating-from-npm)
+- [webpackの開発ドキュメント](https://webpack.js.org/guides/development/)
+- [webpack-dev-serverの設定](https://webpack.js.org/configuration/dev-server/#devserver)
