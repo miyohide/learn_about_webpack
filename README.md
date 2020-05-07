@@ -18,7 +18,7 @@ $ yarn add webpack webpack-cli --dev
 
 JavaScriptは`src`以下に格納し、最初に読まれるJavaScriptファイル（エントリーポイント）を`src/index.js`とする。内容は以下のようなもの。
 
-```js
+```javascript
 import _ from 'lodash';
 
 function component() {
@@ -64,7 +64,7 @@ webpackの実行を簡単にするために、`package.json`に`scripts`を定�
 
 webpackの設定ファイルである`webpack.config.js`を作成する。設定内容は以下の通り。
 
-```js
+```javascript
 const path = require('path');
 
 module.exports = {
@@ -183,7 +183,7 @@ $ yarn add webpack-dev-server --dev
 
 `webpack.config.js`を編集して`devServer`の設定を追加する。全体像は以下の通り。
 
-```js
+```javascript
 const path = require('path');
 const outputPath = path.resolve(__dirname, 'dist');
 
@@ -232,7 +232,7 @@ $ yarn add babel-loader @babel/core @babel/preset-env --dev
 
 webpackで使えるように`webpack.config.js`に設定を追加する。以下の`module`の部分が追加したところ。
 
-```js
+```javascript
 const path = require('path');
 const outputPath = path.resolve(__dirname, 'dist');
 
@@ -280,7 +280,7 @@ $ yarn add core-js@3 --dev
 
 webpackの設定を行います。`module`の部分を下記のものに置き換えます。
 
-```js
+```javascript
   module: {
     rules: [
       {
