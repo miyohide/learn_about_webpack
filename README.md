@@ -278,7 +278,7 @@ module.exports = {
 $ yarn add core-js@3 --dev
 ```
 
-webpackの設定を行います。`module`の部分を下記のものに置き換えます。
+webpackの設定を行う。`module`の部分を下記のものに置き換える。
 
 ```javascript
   module: {
