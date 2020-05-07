@@ -307,9 +307,23 @@ webpackの設定を行う。`module`の部分を下記のものに置き換え�
   }
 ```
 
+とはいえ、`core-js@3`もすべてのものをpolyfill対応できるわけではない。core-jsのリポジトリにある[core-js@3, babel and a look into the future](https://github.com/zloirock/core-js/blob/v3.6.5/docs/2019-03-19-core-js-3-babel-and-a-look-into-the-future.md)によれば、
+
+```
+- It is a polyfill of the JavaScript standard library, which supports:
+    - The latest ECMAScript standard.
+    - ECMAScript standard library proposals.
+    - Some WHATWG / W3C standards (cross-platform or closely related ECMAScript).
+```
+
+とある。例えばここで試している`core-js v3.6.5`においては[ChildNode.replaceWith()](https://developer.mozilla.org/en-US/docs/Web/API/ChildNode/replaceWith)はpolyfill対応できない。
+
+現時点（2020年5月7日）で`core-js`に頼るのは危険かもしれない。
+
 # 参考
 
 - webpackの[Getting Started](https://webpack.js.org/guides/getting-started/)
 - [npmコマンドとyarnコマンドの比較（Migrating from npm）](https://classic.yarnpkg.com/en/docs/migrating-from-npm)
 - [webpackの開発ドキュメント](https://webpack.js.org/guides/development/)
 - [webpack-dev-serverの設定](https://webpack.js.org/configuration/dev-server/#devserver)
+- [core-js@3, babel and a look into the future](https://github.com/zloirock/core-js/blob/v3.6.5/docs/2019-03-19-core-js-3-babel-and-a-look-into-the-future.md)
