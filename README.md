@@ -324,7 +324,7 @@ webpackの設定を行う。`module`の部分を下記のものに置き換え�
 
 webpackは複数のJavaScriptファイルを一つにまとめることができる。
 
-`src\libs\calc.js`として以下の内容を実装する。
+`src/libs/calc.js`として以下の内容を実装する。
 
 ```javascript
 export function add(a, b) {
@@ -334,7 +334,7 @@ export function add(a, b) {
 
 `export`は[MDNを参照](https://developer.mozilla.org/ja/docs/Web/JavaScript/Reference/Statements/export)のこと。
 
-これを`src\index.js`にて以下のように書き換えて`add`関数を使うようにする。
+これを`src/index.js`にて以下のように書き換えて`add`関数を使うようにする。
 
 ```javascript
 import * as lib from "./libs/calc";
@@ -345,7 +345,7 @@ e.innerText = `1 + 2 = ${lib.add(1, 2)}`
 
 `import`は[MDNを参照](https://developer.mozilla.org/ja/docs/Web/JavaScript/Reference/Statements/import)のこと。
 
-`dist\index.html`も以下のように書き換える。
+`dist/index.html`も以下のように書き換える。
 
 ```html
 <!DOCTYPE html>
