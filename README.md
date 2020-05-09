@@ -364,6 +364,96 @@ e.innerText = `1 + 2 = ${lib.add(1, 2)}`
 
 これで、`1 + 2 = 3`という感じで表示される。
 
+# ページごとに固有のJavaScriptを用意する
+
+webpackは複数のJavaScriptをまとめるが、時にはページごとに固有のJavaScriptを用意したいことがある。
+
+当該ページの`body`タグに固有の`id`属性を振っておいて、ページごとの処理をその`id`ごとに実装するというのも手ではあるが、なんとなくイケていない。
+
+webpackはentrypointを複数個もたせることができ、これを用いてページごとに固有のJavaScriptを用意することができる。[webpackの解説ページ](https://webpack.js.org/concepts/entry-points/#multi-page-application)も併せて参照のこと。
+
+`src/libs/logger.js`を下記の内容で作成する。
+
+```javascript
+export function debug(msg, from) {
+  console.log(`${msg} from ${from}`)
+}
+```
+
+pageA用のJavaScriptを`src/pageA.js`として作成する。
+
+```javascript
+import * as logger from './libs/logger'
+import * as calc from './libs/calc'
+
+logger.debug('Message', 'pageA')
+let e = document.getElementById('app')
+e.innerText = `2 + 3 = ${calc.add(2, 3)}`
+```
+
+pageA用のWebページを`dist/pageA.html`として作成する。
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>page A</title>
+</head>
+<body>
+    <h1>page A</h1>
+    <div id="app"></div>
+    <script src="pageA.js"></script>
+</body>
+</html>
+```
+
+`webpack.config.js`も修正する。`entry`の部分をDictionaryにし、`output`の`filename`を`[name].js`にするのがポイント。これで`yarn run build`をすると`main.js`と`pageA.js`が出力される。
+
+```javascript
+const path = require('path');
+const outputPath = path.resolve(__dirname, 'dist');
+
+module.exports = {
+  entry: {
+    main: './src/index.js',
+    pageA: './src/pageA.js'
+  },
+  output: {
+    filename: '[name].js',
+    path: outputPath,
+  },
+  devServer: {
+    contentBase: outputPath
+  },
+  module: {
+    rules: [
+      {
+        test: /\.js$/,
+        exclude: /node_modules/,
+        use: [
+          {
+            loader: 'babel-loader',
+            options: {
+              presets: [
+                [
+                  '@babel/preset-env',
+                  {
+                    useBuiltIns: 'usage',
+                    corejs: 3
+                  }
+                ]
+              ]
+            }
+          }
+        ]
+      }
+    ]
+  }
+};
+```
+
 # 参考
 
 - webpackの[Getting Started](https://webpack.js.org/guides/getting-started/)
