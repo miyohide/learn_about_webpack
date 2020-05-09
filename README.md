@@ -320,6 +320,50 @@ webpackの設定を行う。`module`の部分を下記のものに置き換え�
 
 現時点（2020年5月7日）で`core-js`に頼るのは危険かもしれない。
 
+# 複数のファイルを纏める
+
+webpackは複数のJavaScriptファイルを一つにまとめることができる。
+
+`src\libs\calc.js`として以下の内容を実装する。
+
+```javascript
+export function add(a, b) {
+  return a + b
+}
+```
+
+`export`は[MDNを参照](https://developer.mozilla.org/ja/docs/Web/JavaScript/Reference/Statements/export)のこと。
+
+これを`src\index.js`にて以下のように書き換えて`add`関数を使うようにする。
+
+```javascript
+import * as lib from "./libs/calc";
+
+const e = document.getElementById('app')
+e.innerText = `1 + 2 = ${lib.add(1, 2)}`
+```
+
+`import`は[MDNを参照](https://developer.mozilla.org/ja/docs/Web/JavaScript/Reference/Statements/import)のこと。
+
+`dist\index.html`も以下のように書き換える。
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>webpack sample</title>
+</head>
+<body>
+    <div id="app"></div>
+    <script src="main.js"></script>
+</body>
+</html>
+```
+
+これで、`1 + 2 = 3`という感じで表示される。
+
 # 参考
 
 - webpackの[Getting Started](https://webpack.js.org/guides/getting-started/)
@@ -327,3 +371,5 @@ webpackの設定を行う。`module`の部分を下記のものに置き換え�
 - [webpackの開発ドキュメント](https://webpack.js.org/guides/development/)
 - [webpack-dev-serverの設定](https://webpack.js.org/configuration/dev-server/#devserver)
 - [core-js@3, babel and a look into the future](https://github.com/zloirock/core-js/blob/v3.6.5/docs/2019-03-19-core-js-3-babel-and-a-look-into-the-future.md)
+- [JavaScriptのexport](https://developer.mozilla.org/ja/docs/Web/JavaScript/Reference/Statements/export)
+- [JavaScriptのimport](https://developer.mozilla.org/ja/docs/Web/JavaScript/Reference/Statements/import)
