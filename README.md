@@ -454,6 +454,48 @@ module.exports = {
 };
 ```
 
+このままだとページが追加するたびに`webpack.config.js`を編集する必要がある。これを簡略化する。`webpack.config.js`の`entry`をDictionaryとして与えればいいので、例えば以下のようなコードを`webpack.config.js`に書けばよい。
+
+```javascript
+const outputPath = path.resolve(__dirname, 'dist');
+// 以下を追加
+const glob = require('glob');
+var entries = {};
+
+glob.sync('./src/*.js').forEach(v => {
+  let key = v.replace('./src/', '');
+  entries[key] = v;
+});
+// module.exports内はentryとoutputの中身を修正
+module.exports = {
+  entry: entries,
+  output: {
+    filename: '[name]',
+    path: outputPath,
+  },
+// 以下省略
+```
+
+`src`直下にあるJavaScriptのファイル名をDictionaryのキーに、相対パスをDictionaryの値にして`entries`に格納して、`entry`に設定しています。
+`output`の`filename`は拡張子`js`がだぶるので、`.js`を削除しています。
+
+この対応に伴い`index.html`で読み込むJavaScriptが`main.js`から`index.js`に変更になるので併せて修正する。
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>webpack sample</title>
+</head>
+<body>
+    <div id="app"></div>
+    <script src="index.js"></script>
+</body>
+</html>
+```
+
 # 参考
 
 - webpackの[Getting Started](https://webpack.js.org/guides/getting-started/)

@@ -1,13 +1,17 @@
 const path = require('path');
+const glob = require('glob');
 const outputPath = path.resolve(__dirname, 'dist');
+var entries = {};
+
+glob.sync('./src/*.js').forEach(v => {
+  let key = v.replace('./src/', '');
+  entries[key] = v;
+});
 
 module.exports = {
-  entry: {
-    main: './src/index.js',
-    pageA: './src/pageA.js'
-  },
+  entry: entries,
   output: {
-    filename: '[name].js',
+    filename: '[name]',
     path: outputPath,
   },
   devServer: {
