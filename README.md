@@ -496,6 +496,122 @@ module.exports = {
 </html>
 ```
 
+# 複数のエントリーポイント感で利用している共通モジュールをまとめる
+
+例えば、次のようなJavaScriptを用意する。
+
+```javascript
+// src/pageA.js
+import * as logger from './libs/logger'
+import * as calc from './libs/calc'
+import $ from 'jquery'
+
+const e = $('#app')
+e.text(`2 + 3 = ${calc.add(2, 3)}`)
+logger.debug('Message', 'pageA')
+for (let i = 0; i < 100; i++) {
+ e.fadeToggle(1000)
+}
+```
+
+```javascript
+// src/pageB.js
+import * as calc from "./libs/calc"
+import $ from 'jquery'
+
+const e = $('#app')
+e.text(`1 + 2 = ${calc.add(1, 2)}`)
+for (let i = 0; i < 100; i++) {
+ e.fadeToggle(500)
+}
+```
+
+この2つのJavaScriptはjQueryを使っている。これをwebpackでbuildするとそれぞれ大きなファイルが生成される。
+
+```
+$ yarn run build
+yarn run v1.22.4
+$ webpack --mode=production
+Hash: 6cca60ccfcda7a1a174e
+Version: webpack 4.43.0
+Time: 535ms
+Built at: 2020/05/11 20:20:16
+   Asset      Size  Chunks             Chunk Names
+pageA.js  89.1 KiB       0  [emitted]  pageA.js
+pageB.js    89 KiB       1  [emitted]  pageB.js
+Entrypoint pageA.js = pageA.js
+Entrypoint pageB.js = pageB.js
+[0] ./src/libs/calc.js 45 bytes {0} {1} [built]
+[2] ./src/pageB.js 178 bytes {1} [built]
+[3] ./src/pageA.js + 1 modules 354 bytes {0} [built]
+    | ./src/pageA.js 254 bytes [built]
+    | ./src/libs/logger.js 90 bytes [built]
+    + 1 hidden module
+✨  Done in 1.05s.
+
+$ ls -l dist/*.js
+-rw-r--r--  1 miyohide  staff  91213  5 11 20:20 dist/pageA.js
+-rw-r--r--  1 miyohide  staff  91141  5 11 20:20 dist/pageB.js
+$
+```
+
+`dist/pageA.js`と`dist/pageB.js`それぞれにおいてjQueryが含まれているためファイルサイズが大きくなってしまう。これを解消するのが`optimization.splitChunks`。
+
+`optimization.splitChunks`を使うには`webpack.config.js`に以下の設定を追加する。
+
+```javascript
+  optimization: {
+    splitChunks: {
+      name: 'vendor.js',
+      chunks: 'initial'
+    }
+  }
+```
+
+これだけでpageA.jsとpageB.jsで共通のものを自動判別して`vendor.js`にまとめてくれる。実際に試してみる。
+
+```
+$ yarn run build
+yarn run v1.22.4
+$ webpack --mode=production
+Hash: c6fb854519d894a16855
+Version: webpack 4.43.0
+Time: 515ms
+Built at: 2020/05/11 20:27:31
+    Asset      Size  Chunks             Chunk Names
+ pageA.js  1.78 KiB       1  [emitted]  pageA.js
+ pageB.js  1.71 KiB       2  [emitted]  pageB.js
+vendor.js  87.9 KiB       0  [emitted]  vendor.js
+Entrypoint pageA.js = vendor.js pageA.js
+Entrypoint pageB.js = vendor.js pageB.js
+[0] ./src/libs/calc.js 45 bytes {1} {2} [built]
+[2] ./src/pageB.js 178 bytes {2} [built]
+[3] ./src/pageA.js + 1 modules 354 bytes {1} [built]
+    | ./src/pageA.js 254 bytes [built]
+    | ./src/libs/logger.js 90 bytes [built]
+    + 1 hidden module
+✨  Done in 1.01s.
+
+$ ls -l dist/*.js
+-rw-r--r--  1 miyohide  staff   1819  5 11 20:27 dist/pageA.js
+-rw-r--r--  1 miyohide  staff   1747  5 11 20:27 dist/pageB.js
+-rw-r--r--  1 miyohide  staff  90047  5 11 20:27 dist/vendor.js
+$
+```
+
+`dist/pageA.js`と`dist/pageB.js`のファイルサイズが小さくなっているとともに`dist/vendor.js`が追加されている。`dist/vendor.js`はjQueryやその他共通的な処理が含まれている。後はこれをHTMLで読み込ませればよい。読み込むのは`pageA.js`や`pageB.js`の前にする。
+
+```html
+<body>
+    <h1>page A</h1>
+    <div id="app"></div>
+    <script src="vendor.js"></script>
+    <script src="pageA.js"></script>
+</body>
+```
+
+細かい設定は[webpackのドキュメント](https://webpack.js.org/plugins/split-chunks-plugin/)を参照のこと。
+
 # 参考
 
 - webpackの[Getting Started](https://webpack.js.org/guides/getting-started/)
@@ -505,3 +621,4 @@ module.exports = {
 - [core-js@3, babel and a look into the future](https://github.com/zloirock/core-js/blob/v3.6.5/docs/2019-03-19-core-js-3-babel-and-a-look-into-the-future.md)
 - [JavaScriptのexport](https://developer.mozilla.org/ja/docs/Web/JavaScript/Reference/Statements/export)
 - [JavaScriptのimport](https://developer.mozilla.org/ja/docs/Web/JavaScript/Reference/Statements/import)
+- [SplitChunksPluginのドキュメント](https://webpack.js.org/plugins/split-chunks-plugin/)
