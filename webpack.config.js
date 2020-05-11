@@ -36,5 +36,11 @@ module.exports = {
         ]
       }
     ]
+  },
+  optimization: {
+    splitChunks: {
+      name: 'vendor.js',
+      chunks: 'initial'
+    }
   }
 };
