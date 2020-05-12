@@ -17,6 +17,7 @@ module.exports = {
   devServer: {
     contentBase: outputPath
   },
+  devtool: 'eval-source-map',
   module: {
     rules: [
       {

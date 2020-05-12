@@ -612,6 +612,18 @@ $
 
 細かい設定は[webpackのドキュメント](https://webpack.js.org/plugins/split-chunks-plugin/)を参照のこと。
 
+# ソースマップの出力
+
+webpackは複数のJavaScriptをまとめて変換を行うため、そのままではデバッグが難しい。そこでwebpackで変換したソースと変換元のソースを関連付けるファイルを生成させてデバッグを用意にする。この関連つけられたファイルをソースマップと呼ぶ。
+
+ソースマップは`webpack.config.js`に対して以下の設定を追加するだけでよい。
+
+```javascript
+  devtool: 'eval-source-map',
+```
+
+`devtool`の値にはさまざまなものが取れる。詳細は[webpackのDevtoolのページ](https://webpack.js.org/configuration/devtool/)を参照のこと。ここでは、変換に時間はかかってもいいので、元のソースを維持してデバッグをしやすい`eval-source-map`を指定した。
+
 # 参考
 
 - webpackの[Getting Started](https://webpack.js.org/guides/getting-started/)
