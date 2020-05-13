@@ -624,6 +624,106 @@ webpackは複数のJavaScriptをまとめて変換を行うため、そのまま
 
 `devtool`の値にはさまざまなものが取れる。詳細は[webpackのDevtoolのページ](https://webpack.js.org/configuration/devtool/)を参照のこと。ここでは、変換に時間はかかってもいいので、元のソースを維持してデバッグをしやすい`eval-source-map`を指定した。
 
+# webpackの設定を本番と開発で分ける
+
+ここまでwebpackの設定を`webpack.config.js`に書いてきたがかなり長くなってきた。なんとなくwebpackのドキュメントを見ていたら[webpackのProductionのページ](https://webpack.js.org/guides/production/)に設定ファイルを分割する方法が載っていたので試す。
+
+まず、`webpack-merge`をインストールする。
+
+```
+$ yarn add webpack-merge --dev
+```
+
+共通設定用の`webpack.common.js`、開発環境用の`webpack.dev.js`、本番環境用の`webpack.prod.js`をそれぞれ作る。
+
+まずは共通の`webpack.common.js`。
+
+```javascript
+// webpack.common.js
+const path = require('path');
+const glob = require('glob');
+const outputPath = path.resolve(__dirname, 'dist');
+var entries = {};
+
+glob.sync('./src/*.js').forEach(v => {
+  let key = v.replace('./src/', '');
+  entries[key] = v;
+});
+
+module.exports = {
+  entry: entries,
+  output: {
+    filename: '[name]',
+    path: outputPath,
+  },
+  module: {
+    rules: [
+      {
+        test: /\.js$/,
+        exclude: /node_modules/,
+        use: [
+          {
+            loader: 'babel-loader',
+            options: {
+              presets: [
+                [
+                  '@babel/preset-env',
+                ]
+              ]
+            }
+          }
+        ]
+      }
+    ]
+  },
+  optimization: {
+    splitChunks: {
+      name: 'vendor.js',
+      chunks: 'initial'
+    }
+  }
+};
+```
+
+続いて開発用の`webpack.dev.js`。最初の2行で共通設定を読み込めば後は必要な部分だけを上書きするだけ。
+
+```javascript
+// webpack.dev.js
+const merge = require('webpack-merge')
+const common = require('./webpack.common.js')
+const path = require('path')
+const outputPath = path.resolve(__dirname, 'dist')
+
+module.exports = merge(common, {
+  mode: 'development',
+  devtool: 'eval-source-map',
+  devServer: {
+    contentBase: outputPath
+  }
+})
+```
+
+最後に本番環境用の`webpack.prod.js`。
+
+```javascript
+// webpack.prod.js
+const merge = require('webpack-merge')
+const common = require('./webpack.common.js')
+
+module.exports = merge(common, {
+  mode: 'production'
+})
+```
+
+あとは、`package.json`の`scripts`にて開発用/本番用に設定ファイルを変える。`--config`オプションを指定するだけ。
+
+```json
+  "scripts": {
+    "build": "webpack --config webpack.prod.js",
+    "start": "webpack-dev-server --config webpack.dev.js --open"
+  },
+```
+
 # 参考
 
 - webpackの[Getting Started](https://webpack.js.org/guides/getting-started/)
@@ -634,3 +734,4 @@ webpackは複数のJavaScriptをまとめて変換を行うため、そのまま
 - [JavaScriptのexport](https://developer.mozilla.org/ja/docs/Web/JavaScript/Reference/Statements/export)
 - [JavaScriptのimport](https://developer.mozilla.org/ja/docs/Web/JavaScript/Reference/Statements/import)
 - [SplitChunksPluginのドキュメント](https://webpack.js.org/plugins/split-chunks-plugin/)
+- [webpackにて設定ファイルを分離する](https://webpack.js.org/guides/production/)
