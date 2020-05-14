@@ -1,6 +1,7 @@
 const path = require('path');
 const glob = require('glob');
 const outputPath = path.resolve(__dirname, 'dist');
+const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 var entries = {};
 
 glob.sync('./src/*.js').forEach(v => {
@@ -34,6 +35,9 @@ module.exports = {
       }
     ]
   },
+  plugins: [
+    new CleanWebpackPlugin(),
+  ],
   optimization: {
     splitChunks: {
       name: 'vendor.js',
