@@ -724,6 +724,38 @@ module.exports = merge(common, {
   },
 ```
 
+## distディレクトリ内をwebpack実行のたびに削除する
+
+webpackの実行結果は`dist`に出力されるけれども、以前の結果が`dist`に残ってしまうかもしれないため実行前に削除したい。それを実行するためには`clean-webpack-plugin`を使えばよい。参考として[webpackのOutput Managementのページ](https://webpack.js.org/guides/output-management/#cleaning-up-the-dist-folder)を参照のこと。
+
+```
+yarn add clean-webpack-plugin --dev
+```
+
+で`clean-webpack-plugin`をインストールして、`webpack.common.js`に
+
+```javascript
+const { CleanWebpackPlugin } = require('clean-webpack-plugin')
+```
+
+と
+
+```javascript
+  plugins: [
+    new CleanWebpackPlugin(),
+  ],
+```
+
+を追加すればOK。
+
+ただこれだと`dist`においたHTMLファイルも一緒に削除される。このためHTMLファイルは`src\html`以下において、`webpack.dev.js`内にある`devServer`の`contentBase`を以下のように設定する。
+
+```javascript
+  devServer: {
+    contentBase: [path.join(__dirname, 'src', 'html'), outputPath]
+  }
+```
+
 # 参考
 
 - webpackの[Getting Started](https://webpack.js.org/guides/getting-started/)
@@ -735,3 +767,4 @@ module.exports = merge(common, {
 - [JavaScriptのimport](https://developer.mozilla.org/ja/docs/Web/JavaScript/Reference/Statements/import)
 - [SplitChunksPluginのドキュメント](https://webpack.js.org/plugins/split-chunks-plugin/)
 - [webpackにて設定ファイルを分離する](https://webpack.js.org/guides/production/)
+- [webpackのOutput Managementのページ](https://webpack.js.org/guides/output-management/#cleaning-up-the-dist-folder)
